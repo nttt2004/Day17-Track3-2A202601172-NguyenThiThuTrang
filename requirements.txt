@@ -7,7 +7,8 @@ google-genai>=1.0,<2
 
 # Local baseline stores
 redis>=6,<7
-qdrant-client>=1.15,<2
+grpcio>=1.60.0,<2
+qdrant-client==1.18.0
 scikit-learn>=1.7,<2
 
 # Lab utilities
