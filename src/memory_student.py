@@ -4,72 +4,81 @@ from typing import Any
 
 from .config import settings
 from .context_budget import ContextBudgetManager
-from .utils import cap_query
+from .utils import cap_query, join_nonempty
 from .zep_common import prime_eval_thread, render_graph_search
 
 
 class StudentMemory:
-    """Only this file needs to be edited by students."""
+    """Class được phép chỉnh sửa dành cho sinh viên."""
 
     def __init__(self, client: Any):
         self.client = client
+        # Khởi tạo bộ quản lý ngân sách token dựa trên cấu hình hệ thống
         self.budget = ContextBudgetManager(settings.context_tokens)
 
-    # NOTE: Zep rejects graph.search queries longer than 400 characters. Some
-    # eval queries are longer than that, so wrap every query with
-    # `cap_query(query)` (see src/utils.py) before passing it to graph.search.
+    # LƯU Ý: Đồ thị Zep giới hạn độ dài truy vấn tối đa 400 ký tự.
+    # Hàm cap_query() sẽ được dùng để cắt gọn query trước khi gọi API graph.search.
 
     def retrieve_long_term(self, user_id: str, thread_id: str, query: str) -> str:
-        # LAB TODO 1/4
-        # 1) prime_eval_thread(...) has already been provided as scaffolding.
-        # 2) call thread.get_user_context(thread_id=...)
-        # 3) return the .context string.
-        # Bonus: append graph.search(scope="edges", limit>=20) facts with
-        #        validity ranges (a low limit can miss deadline/open-loop facts).
+        # 1. Kích hoạt thread với câu query hiện tại để Zep nhận diện được ngữ cảnh
         prime_eval_thread(self.client, user_id, thread_id, query)
-        context = self.client.thread.get_user_context(thread_id=thread_id)
-        return context.context
+
+        # 2. Lấy khối thông tin tóm tắt (Context Block) của người dùng trong thread
+        ctx_obj = self.client.thread.get_user_context(thread_id=thread_id)
+        summary_block = getattr(ctx_obj, "context", "") or ""
+
+        # 3. Truy xuất thêm các sự kiện (facts) từ đồ thị để tránh lọt thông tin quan trọng
+        safe_query = cap_query(query)
+        try:
+            graph_data = self.client.graph.search(
+                user_id=user_id,
+                query=safe_query,
+                scope="edges",
+                limit=20,
+            )
+            retrieved_facts = render_graph_search(graph_data)
+        except Exception:
+            # Nếu có lỗi trong quá trình lấy fact thì bỏ qua (trả về chuỗi rỗng)
+            retrieved_facts = ""
+
+        # 4. Gộp kết quả: Đặt tóm tắt (summary) lên trên facts để ưu tiên giữ lại khi bị cắt bớt
+        return join_nonempty([summary_block, retrieved_facts], sep="\n\n")
 
     def retrieve_episodic(self, user_id: str, query: str) -> str:
-        # LAB TODO 2/4
-        # Use client.graph.search(user_id=..., query=cap_query(query),
-        #     scope="episodes", limit=...) then render_graph_search(...).
-        # Tip: verbose session episodes can crowd out concise, marker-bearing
-        # reflections under the tight episodic budget — render_graph_search
-        # accepts an `episode_char_cap` to keep more distinct episodes.
-        results = self.client.graph.search(
+        # Tìm lại các đoạn tin nhắn gốc (episodes) trong đồ thị cá nhân của user
+        search_res = self.client.graph.search(
             user_id=user_id,
             query=cap_query(query),
             scope="episodes",
-            limit=5,
+            limit=15,
         )
-        return render_graph_search(results, episode_char_cap=400)
+        # Ép độ dài mỗi episode xuống tối đa 180 ký tự để nhồi nhét được nhiều kết quả vào mức budget 3%
+        return render_graph_search(search_res, episode_char_cap=180)
 
     def retrieve_semantic(self, graph_id: str, query: str) -> str:
-        # LAB TODO 3/4
-        # Search the standalone graph (graph_id, NOT user_id).
-        # Recommended: scope="episodes" — it returns raw document text that keeps
-        # literal markers (e.g. PAYMENT-RULE-3). The "auto" scope returns
-        # extracted facts that DROP those literal codes, so avoid it here.
-        # Fallback: scope="nodes".
-        results = self.client.graph.search(
-            graph_id=graph_id,
-            query=cap_query(query),
-            scope="episodes",
-            limit=8,
-        )
-        text = render_graph_search(results)
-        if not text.strip():
-            results = self.client.graph.search(
+        capped_q = cap_query(query)
+        
+        try:
+            # Tìm kiếm trên graph dùng chung (graph_id) để lấy văn bản tài liệu nguyên bản
+            raw_results = self.client.graph.search(
                 graph_id=graph_id,
-                query=cap_query(query),
+                query=capped_q,
+                scope="episodes",
+                limit=8,
+            )
+        except Exception:
+            # Phương án dự phòng: Nếu không lấy được episodes thì chuyển sang lấy thực thể (nodes)
+            raw_results = self.client.graph.search(
+                graph_id=graph_id,
+                query=capped_q,
                 scope="nodes",
                 limit=8,
             )
-            text = render_graph_search(results)
-        return text
+            
+        # Không cắt giảm số lượng ký tự ở bước này để tránh làm mất các marker quan trọng ở cuối văn bản
+        return render_graph_search(raw_results)
 
     def assemble_context(self, layers: dict[str, str]) -> tuple[str, dict[str, dict[str, int]]]:
-        # LAB TODO 4/4
-        # Use ContextBudgetManager to enforce 10/4/3/3 budget and priority order.
+        # Giao phó toàn bộ công việc phân bổ ngân sách (với tỷ lệ 10/4/3/3 và thứ tự ưu tiên) 
+        # cho ContextBudgetManager xử lý.
         return self.budget.assemble(layers)
