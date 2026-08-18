@@ -5,22 +5,22 @@
 - Cases: **11**
 - Passed: **11/11**
 - Evidence hit rate: **100.0%**
-- Average retrieval latency: **2237.5 ms**
+- Average retrieval latency: **1267.0 ms**
 - Average token reduction vs full source context: **14.2%**
 
 | Case | Layer | Pass | Latency ms | Retrieved tokens | Token reduction | Missing / Error |
 | --- | --- | --- | ---: | ---: | ---: | --- |
-| E01 | short_term | PASS | 0.0 | 133 | 0.0% |  |
-| E06 | semantic | PASS | 1503.0 | 148 | 67.8% |  |
-| E09 | long_term | PASS | 2353.4 | 682 | 0.0% |  |
-| E10 | short_term | PASS | 0.4 | 195 | 0.0% |  |
-| E02 | long_term | PASS | 3472.8 | 1218 | 0.0% |  |
-| E03 | long_term | PASS | 3076.7 | 1238 | 0.0% |  |
-| E04 | episodic | PASS | 727.8 | 248 | 0.0% |  |
-| E05 | episodic | PASS | 392.9 | 267 | 0.0% |  |
-| E07 | mixed | PASS | 8659.3 | 485 | 14.2% |  |
-| E11 | semantic | PASS | 2187.2 | 146 | 74.2% |  |
-| E08 | long_term | PASS | 2239.0 | 1204 | 0.0% |  |
+| E01 | short_term | PASS | 0.1 | 133 | 0.0% |  |
+| E06 | semantic | PASS | 2119.4 | 148 | 67.8% |  |
+| E09 | long_term | PASS | 1913.4 | 801 | 0.0% |  |
+| E10 | short_term | PASS | 0.5 | 195 | 0.0% |  |
+| E02 | long_term | PASS | 2452.5 | 1397 | 0.0% |  |
+| E03 | long_term | PASS | 2560.2 | 1415 | 0.0% |  |
+| E04 | episodic | PASS | 296.4 | 233 | 0.0% |  |
+| E05 | episodic | PASS | 305.5 | 252 | 0.0% |  |
+| E07 | mixed | PASS | 2139.3 | 485 | 14.2% |  |
+| E11 | semantic | PASS | 300.8 | 146 | 74.2% |  |
+| E08 | long_term | PASS | 1848.7 | 1401 | 0.0% |  |
 
 ## Evidence excerpts
 
@@ -34,7 +34,7 @@
 
 ### E09 - long_term
 
-`<EPISODES> Episodes are source message or document excerpts shown in selection order.   - Created At: 2026-08-01 11:00:20     Source: message     Content: Lab Assistant (assistant): Da hieu: LOTUS-88, Java + Spring Boot cho backend examples.   - Created At: 2026-08-01 11:00:00     Source: message     Content: [user] {   "user_id": "lan-lab17",   "first_name": "Lan",   "last_name": "Tran",   "user_alias": "Lan Tran" }: Toi la Lan. Du an cua toi la LOTUS-88. Toi uu tien Java va Spring Boot, va khong dung Python trong vi du backend. </EPISODES>  <FACTS> The timestamp shown for each fact is the reference time of the source message that introduced it — i.e. when the fact was first mentioned. `dat`
+`<USER_SUMMARY> Lan's project is LOTUS-88. They prioritize Java and Spring Boot for backend development and do not use Python. </USER_SUMMARY>  <EPISODES> Episodes are source message or document excerpts shown in selection order.   - Created At: 2026-08-01 11:00:20     Source: message     Content: Lab Assistant (assistant): Da hieu: LOTUS-88, Java + Spring Boot cho backend examples.   - Created At: 2026-08-01 11:00:00     Source: message     Content: [user] {   "user_id": "lan-lab17",   "first_name": "Lan",   "last_name": "Tran",   "user_alias": "Lan Tran" }: Toi la Lan. Du an cua toi la LOTUS-88. Toi uu tien Java va Spring Boot, va khong dung Python trong vi du backend. </EPISODES>  <FACTS> `
 
 ### E10 - short_term
 
@@ -42,11 +42,11 @@
 
 ### E02 - long_term
 
-`<EPISODES> Episodes are source message or document excerpts shown in selection order.   - Created At: 2026-08-01 09:00:00     Source: message     Content: [user] {   "user_id": "minh-lab17",   "first_name": "Minh",   "last_name": "Nguyen",   "user_alias": "Minh Nguyen" }: Ten du an ca nhan cua toi la ORCHID-27. Toi thich Python va khong thich Java. Khi giai thich code, hay dung vi du ngan. </EPISODES>  <FACTS> The timestamp shown for each fact is the reference time of the source message that introduced it — i.e. when the fact was first mentioned. `date unknown` means no reference time is recorded for the source message.   - Minh Nguyen's personal project is ORCHID-27. (2026-08-01 09:00:00)  `
+`<USER_SUMMARY> Minh is working on a personal project named ORCHID-27 and is addressing the ASYNC-FIX-20 issue. For the company project BLUEBIRD-42, the backend must use TypeScript with NestJS, not Python. Minh still prefers Python for personal demos like ORCHID-27. An effective solution for ASYNC-FIX-20 involves reusing the aiohttp ClientSession and setting concurrency to 20, as increasing the timeout was not effective. The core problem is connection churn. Minh has a deadline to complete a benchmark report by Friday at 16:00. Minh is currently debugging async HTTP requests.  Minh prefers Python and dislikes Java. When explaining code, Minh prefers concise examples. Minh is currently learnin`
 
 ### E03 - long_term
 
-`<EPISODES> Episodes are source message or document excerpts shown in selection order.   - Created At: 2026-08-01 09:04:00     Source: message     Content: [user] {   "user_id": "minh-lab17",   "first_name": "Minh",   "last_name": "Nguyen",   "user_alias": "Minh Nguyen" }: TODO: hoan thanh benchmark report truoc thu Sau luc 16:00. Day la open loop LAB-REPORT-1600. </EPISODES>  <FACTS> The timestamp shown for each fact is the reference time of the source message that introduced it — i.e. when the fact was first mentioned. `date unknown` means no reference time is recorded for the source message.   - Minh Nguyen increased the timeout to 60s. (2026-08-03 10:00:00)   - Minh Nguyen likes Python. (`
+`<USER_SUMMARY> Minh is working on a personal project named ORCHID-27 and is addressing the ASYNC-FIX-20 issue. For the company project BLUEBIRD-42, the backend must use TypeScript with NestJS, not Python. Minh still prefers Python for personal demos like ORCHID-27. An effective solution for ASYNC-FIX-20 involves reusing the aiohttp ClientSession and setting concurrency to 20, as increasing the timeout was not effective. The core problem is connection churn. Minh has a deadline to complete a benchmark report by Friday at 16:00. Minh is currently debugging async HTTP requests.  Minh prefers Python and dislikes Java. When explaining code, Minh prefers concise examples. Minh is currently learnin`
 
 ### E04 - episodic
 
@@ -58,7 +58,7 @@
 
 ### E07 - mixed
 
-`<LONG_TERM> <EPISODES> Episodes are source message or document excerpts shown in selection order.   - Created At: 2026-08-01 09:00:00     Source: message     Content: [user] {   "user_id": "minh-lab17",   "first_name": "Minh",   "last_name": "Nguyen",   "user_alias": "Minh Nguyen" }: Ten du an ca nhan cua toi la ORCHID-27. Toi thich Python va khong thich Java. Khi giai thich code, hay dung vi du ngan. </EPISODES>  <FACTS> The timestamp shown for each fact is the reference time of the source message that introduced it — i.e. when the fact was first mentioned. `date unknown` means no reference time is recorded for the source message.   - Minh Nguyen likes Python. (2026-08-01 09:00:00)   - Minh`
+`<LONG_TERM> <USER_SUMMARY> Minh is working on a personal project named ORCHID-27 and is addressing the ASYNC-FIX-20 issue. For the company project BLUEBIRD-42, the backend must use TypeScript with NestJS, not Python. Minh still prefers Python for personal demos like ORCHID-27. An effective solution for ASYNC-FIX-20 involves reusing the aiohttp ClientSession and setting concurrency to 20, as increasing the timeout was not effective. The core problem is connection churn. Minh has a deadline to complete a benchmark report by Friday at 16:00. Minh is currently debugging async HTTP requests.  Minh prefers Python and dislikes Java. When explaining code, Minh prefers concise examples. Minh is curre`
 
 ### E11 - semantic
 
@@ -66,4 +66,4 @@
 
 ### E08 - long_term
 
-`<EPISODES> Episodes are source message or document excerpts shown in selection order.   - Created At: 2026-08-05 08:00:00     Source: message     Content: [user] {   "user_id": "minh-lab17",   "first_name": "Minh",   "last_name": "Nguyen",   "user_alias": "Minh Nguyen" }: Cap nhat moi: voi du an cong ty BLUEBIRD-42, backend bat buoc dung TypeScript voi NestJS; khong dung Python cho backend du an nay. Preference Python van dung cho demo ca nhan ORCHID-27. </EPISODES>  <FACTS> The timestamp shown for each fact is the reference time of the source message that introduced it — i.e. when the fact was first mentioned. `date unknown` means no reference time is recorded for the source message.   - Mi`
+`<USER_SUMMARY> Minh is working on a personal project named ORCHID-27 and is addressing the ASYNC-FIX-20 issue. For the company project BLUEBIRD-42, the backend must use TypeScript with NestJS, not Python. Minh still prefers Python for personal demos like ORCHID-27. An effective solution for ASYNC-FIX-20 involves reusing the aiohttp ClientSession and setting concurrency to 20, as increasing the timeout was not effective. The core problem is connection churn. Minh has a deadline to complete a benchmark report by Friday at 16:00. Minh is currently debugging async HTTP requests.  Minh prefers Python and dislikes Java. When explaining code, Minh prefers concise examples. Minh is currently learnin`
